@@ -1,2 +1,3 @@
 (library
- (name mitochondria))
+ (name mitochondria)
+ (libraries miou miou.unix parseff picos picos_io unix))

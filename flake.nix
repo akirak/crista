@@ -36,8 +36,7 @@
             duneVersion = "3";
             src = self.outPath;
 
-            # nativeBuildInputs = [
-            # ];
+            nativeBuildInputs = [ gitMinimal ];
 
             buildInputs = with ocamlPackages; [ ocaml-syntax-shims ];
 
@@ -65,6 +64,7 @@
                 ocaml-lsp
                 ocamlformat
                 ocp-indent
+                alcotest
                 utop
                 # Needed for generating documentation
                 opam
