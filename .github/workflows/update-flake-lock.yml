@@ -1,0 +1,30 @@
+name: Update flake.lock
+
+on:
+  schedule:
+    - cron: "0 0 */5 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Set up Nix
+        uses: ./.github/actions/setup
+
+      - name: Update flake.lock
+        run: nix flake update --inputs-from github:akirak/flake-pins
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7
+        with:
+          commit-message: Update flake.lock
+          title: Update flake.lock
+          body: Automated update of flake.lock.
+          branch: update-flake-lock
