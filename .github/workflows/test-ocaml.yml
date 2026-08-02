@@ -2,7 +2,17 @@ name: Test OCaml
 
 on:
   push:
+    branches:
+      - main
+    paths:
+      - 'bin/**'
+      - 'lib/**'
+      - 'test/**'
+      - dune-project
   pull_request:
+    paths-ignore:
+      - 'README.*'
+      - 'docs/**'
   workflow_dispatch:
 
 permissions: read-all
