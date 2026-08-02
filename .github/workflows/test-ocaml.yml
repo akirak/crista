@@ -20,8 +20,6 @@ jobs:
         ocaml-compiler:
           # Minimal minor version
           - "5.3"
-          # Latest minor version
-          - "5.5"
           # Major
           - "5"
 
