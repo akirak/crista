@@ -11,11 +11,11 @@
  (synopsis "A minimalistic HTTP server framework for OCaml 5")
  (description "A small direct-style server framework for OCaml 5 built on top of the Miou scheduler")
  (depends
-  (ocaml (>= 5.2))
-  picos
-  picos_io
-  miou
-  parseff
+  (ocaml (>= 5.3))
+   picos
+   picos_io
+   miou
+   parseff
   (alcotest :with-test)
   (routes :with-test))
  (tags

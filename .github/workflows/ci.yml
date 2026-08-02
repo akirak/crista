@@ -18,8 +18,11 @@ jobs:
           - ubuntu-latest
           - macos-latest
         ocaml-compiler:
-          - "5.2"
+          # Minimal minor version
+          - "5.3"
+          # Latest minor version
           - "5.5"
+          # Major
           - "5"
 
     steps:
