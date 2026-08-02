@@ -1,3 +1,4 @@
 (library
+ (public_name crista)
  (name crista)
  (libraries miou miou.unix parseff unix))
