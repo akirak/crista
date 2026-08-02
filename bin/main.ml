@@ -20,13 +20,11 @@ let handler request =
       Response.json ~headers:cors_headers "{\"status\":\"ok\"}"
   | "/__crista/echo" ->
       Response.make
-        ~headers:
-          (Headers.add "x-crista-method" request.meth cors_headers)
+        ~headers:(Headers.add "x-crista-method" request.meth cors_headers)
         ~body:request.body 200
   | "/__crista/redirect" ->
       Response.make
-        ~headers:
-          (Headers.add "location" "/__crista/status" cors_headers)
+        ~headers:(Headers.add "location" "/__crista/status" cors_headers)
         302
   | _ -> Response.text ~headers:cors_headers ~status:404 "Not found\n"
 
