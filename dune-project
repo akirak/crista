@@ -16,6 +16,7 @@
    picos
    picos_io
    miou
+   miou_unix
    parseff
   (alcotest :with-test)
   (odig :with-doc)
