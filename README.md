@@ -1,5 +1,7 @@
 # Crista
 
+[![API documentation](https://img.shields.io/badge/API-documentation-blue)](https://akirak.github.io/crista/crista/)
+
 > [!WARNING]
 > This project was originally developed for internal use and remains
 > experimental. Its APIs are
