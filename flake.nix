@@ -49,6 +49,7 @@
 
             checkInputs = with ocamlPackages; [
               alcotest
+              routes
             ];
           };
         }
@@ -65,6 +66,7 @@
                 ocamlformat
                 ocp-indent
                 alcotest
+                routes
                 utop
                 # Needed for generating documentation
                 opam

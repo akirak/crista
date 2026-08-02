@@ -11,6 +11,7 @@ depends: [
   "miou"
   "parseff"
   "alcotest" {with-test}
+  "routes" {with-test}
   "odoc" {with-doc}
 ]
 build: [

@@ -4,8 +4,6 @@ let port = ref 8080
 
 let bind = ref "127.0.0.1"
 
-let router = Router.create ()
-
 let cors_headers =
   Headers.of_list
     [ ("access-control-allow-origin", "*")
@@ -15,28 +13,22 @@ let cors_headers =
     ; ("access-control-expose-headers", "x-mitochondria-method")
     ; ("cache-control", "no-store") ]
 
-let () =
-  Router.get "/"
-    (fun _request -> Response.text "mitochondria is alive\n")
-    router ;
-  Router.add "/__mitochondria/status"
-    (fun _request ->
-      Response.json ~headers:cors_headers "{\"status\":\"ok\"}" )
-    router ;
-  Router.add "/__mitochondria/echo"
-    (fun request ->
+let handler request =
+  match Request.path request with
+  | "/" -> Response.text "mitochondria is alive\n"
+  | "/__mitochondria/status" ->
+      Response.json ~headers:cors_headers "{\"status\":\"ok\"}"
+  | "/__mitochondria/echo" ->
       Response.make
         ~headers:
           (Headers.add "x-mitochondria-method" request.meth cors_headers)
-        ~body:request.body 200 )
-    router ;
-  Router.add "/__mitochondria/redirect"
-    (fun _request ->
+        ~body:request.body 200
+  | "/__mitochondria/redirect" ->
       Response.make
         ~headers:
           (Headers.add "location" "/__mitochondria/status" cors_headers)
-        302 )
-    router
+        302
+  | _ -> Response.text ~headers:cors_headers ~status:404 "Not found\n"
 
 let usage = "mitochondria [--bind ADDRESS] [--port PORT]"
 
@@ -53,4 +45,4 @@ let () =
       exit 2
   in
   Printf.eprintf "Listening on http://%s:%d\n%!" !bind !port ;
-  Miou_server.run ~address ~port:!port (Router.route router)
+  Miou_server.run ~address ~port:!port handler

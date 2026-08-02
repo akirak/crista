@@ -7,12 +7,23 @@ backend. Request syntax is parsed with Parseff.
 ```ocaml
 open Mitochondria
 
-let router = Router.create ()
+let router =
+  Routes.one_of
+    [ Routes.((s "hello" /? nil) @--> fun request ->
+        Response.text ("Hello from " ^ request.Request.target ^ "!\n")) ]
+
+let handler request =
+  match Routes.match' router ~target:(Request.path request) with
+  | Routes.FullMatch route | Routes.MatchWithTrailingSlash route -> route request
+  | Routes.NoMatch -> Response.text ~status:404 "Not found\n"
 
 let () =
-  Router.get "/hello" (fun _ -> Response.text "Hello!\n") router;
-  Miou_server.run ~port:8080 (Router.route router)
+  Miou_server.run ~port:8080 handler
 ```
+
+Mitochondria does not prescribe a routing library: a server accepts a plain
+`Request.t -> Response.t` handler. The example uses the optional `routes`
+library, while applications can plug in any dispatcher with that shape.
 
 The server supports persistent connections, pipelining, fixed-length and
 chunked request bodies, `Expect: 100-continue`, HEAD responses, and configurable

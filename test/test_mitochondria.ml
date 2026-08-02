@@ -121,24 +121,37 @@ let test_head_response () =
     "body omitted" false
     (String.ends_with ~suffix:"hello" wire)
 
-let test_router () =
-  let router = Router.create () in
-  Router.get "/resource" (fun _ -> Response.empty 204) router ;
+let test_routes_integration () =
+  let router =
+    Routes.one_of
+      [ Routes.(
+          (s "resource" / int /? nil)
+          @--> fun resource_id request ->
+          if request.Request.meth = "GET" then
+            Response.text (string_of_int resource_id)
+          else Response.empty 405 ) ]
+  in
+  let dispatch request =
+    match Routes.match' router ~target:(Request.path request) with
+    | Routes.FullMatch handler | Routes.MatchWithTrailingSlash handler ->
+        handler request
+    | Routes.NoMatch -> Response.empty 404
+  in
   let request meth target =
     Request.make ~meth ~target ~version:`HTTP_1_1 ()
   in
   Alcotest.(check int)
-    "route" 204
-    (Response.status (Router.route router (request "GET" "/resource?q=1"))) ;
-  Alcotest.(check int)
-    "HEAD falls back to GET" 204
-    (Response.status (Router.route router (request "HEAD" "/resource"))) ;
+    "typed route" 200
+    (Response.status (dispatch (request "GET" "/resource/42?q=1"))) ;
+  Alcotest.(check string)
+    "typed parameter" "42"
+    (Response.body (dispatch (request "GET" "/resource/42"))) ;
   Alcotest.(check int)
     "method not allowed" 405
-    (Response.status (Router.route router (request "POST" "/resource"))) ;
+    (Response.status (dispatch (request "POST" "/resource/42"))) ;
   Alcotest.(check int)
     "not found" 404
-    (Response.status (Router.route router (request "GET" "/missing")))
+    (Response.status (dispatch (request "GET" "/missing")))
 
 let () =
   Alcotest.run "mitochondria"
@@ -153,4 +166,5 @@ let () =
       , [ Alcotest.test_case "chunked and pipelined" `Quick
             test_chunked_and_pipelined_connection
         ; Alcotest.test_case "HEAD" `Quick test_head_response ] )
-    ; ("router", [Alcotest.test_case "dispatch" `Quick test_router]) ]
+    ; ( "routing integration"
+      , [Alcotest.test_case "routes" `Quick test_routes_integration] ) ]

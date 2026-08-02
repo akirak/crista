@@ -14,6 +14,7 @@
   picos_io
   miou
   parseff
-  (alcotest :with-test))
+  (alcotest :with-test)
+  (routes :with-test))
  (tags
   (http server miou picos)))
