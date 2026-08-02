@@ -32,7 +32,9 @@ jobs:
         run: opam install . --deps-only --with-doc
 
       - name: Generate documentation
-        run: opam exec -- odig odoc
+        run: |
+          opam exec -- dune build @doc
+          opam exec -- odig odoc
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
