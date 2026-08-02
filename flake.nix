@@ -1,13 +1,17 @@
 {
   inputs = {
     nixpkgs.url = "github:nix-ocaml/nix-overlays";
-    # systems.url = "github:nix-systems/default";
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
     {
       nixpkgs,
       self,
+      treefmt-nix,
       ...
     }:
     let
@@ -26,6 +30,18 @@
             )
           )
         );
+
+      treefmtEval = eachSystem (
+        _system: pkgs:
+        treefmt-nix.lib.evalModule pkgs {
+          projectRootFile = "flake.nix";
+
+          programs.nixfmt.enable = true;
+          programs.ocamlformat.enable = true;
+          programs.zizmor.enable = true;
+          programs.mdformat.enable = true;
+        }
+      );
     in
     {
       packages = eachSystem (
@@ -82,6 +98,16 @@
             ;
           };
         }
+      );
+
+      formatter = eachSystem (system: _pkgs: treefmtEval.${system}.config.build.wrapper);
+
+      checks = eachSystem (
+        system: _pkgs:
+        {
+          treefmt = treefmtEval.${system}.config.build.check self;
+        }
+        // self.packages.${system}
       );
     };
 }
