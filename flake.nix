@@ -66,8 +66,6 @@
             buildInputs = with ocamlPackages; [ ocaml-syntax-shims ];
 
             propagatedBuildInputs = with ocamlPackages; [
-              picos
-              picos_io
               miou
               parseff
             ];
