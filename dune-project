@@ -6,8 +6,10 @@
 
 (package
  (name crista)
- (synopsis "A small direct-style HTTP/1 server framework")
- (description "An HTTP/1.0 and HTTP/1.1 server framework for Miou and Picos")
+ (authors "Akira Komamura <akira.komamura@gmail.com>")
+ (homepage https://github.com/akirak/crista)
+ (synopsis "A minimalistic HTTP server framework for OCaml 5")
+ (description "A small direct-style server framework for OCaml 5 built on top of the Miou scheduler")
  (depends
   (ocaml (>= 5.2))
   picos
