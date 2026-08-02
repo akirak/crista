@@ -3,13 +3,15 @@ export ODIG_CACHE_DIR := justfile_directory() + "/_build/default/.odig"
 # Using _build directory may not be properly allowed for storing user contents
 export SHERLODOC_DB := justfile_directory() + "/_build/default/.sherlodoc.marshal"
 
+demo:
+    dune exec mitochondria
+
+# Run Web Platform Tests. Also set BROWSER to a browser executable
+wpt:
+    WPT_ROOT=vendor/wpt ./scripts/run-wpt.sh
+
+test:
+    dune runtest
+
 odig-odoc:
     odig odoc
-
-sherlodoc-index: odig-odoc
-    find "${ODIG_CACHE_DIR}/odoc" -name '*.odocl' \
-    | grep -v '__' \
-    | xargs sherlodoc index
-
-sherlodoc-serve:
-    sherlodoc serve
