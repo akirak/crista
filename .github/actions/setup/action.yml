@@ -1,0 +1,39 @@
+name: Set up Nix
+
+description: Set up Nix with a GH-native cache enabled
+
+# inputs:
+#   cachix-name:
+#     description: Name of the Cachix account
+#     required: false
+#     default: akirak
+#   cachix-token:
+#     description: Auth token for cachix
+#     required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: nixbuild/nix-quick-install-action@2c9db80fb984ceb1bcaa77cdda3fdf8cfba92035 # v34
+      with:
+        nix_conf: |
+          keep-env-derivations = true
+          keep-outputs = true
+
+    - name: Prepare writable cache directories
+      shell: bash
+      run: |
+        mkdir -p "${RUNNER_TEMP}/.cache/nix"
+        echo "XDG_CACHE_HOME=${RUNNER_TEMP}/.cache" >> "$GITHUB_ENV"
+
+    - name: Restore the package cache
+      uses: nix-community/cache-nix-action@b426b118b6dc86d6952988d396aa7c6b09776d08 # v7
+      with:
+        primary-key: nix-${{ runner.os }}-${{ hashFiles('**/flake.lock') }}
+        restore-prefixes-first-match: nix-${{ runner.os }}-
+        gc-max-store-size-linux: 1G
+
+    # - uses: cachix/cachix-action@v16
+    #   with:
+    #     name: ${{ inputs.cachix-name }}
+    #     authToken: '${{ inputs.cachix-token }}'

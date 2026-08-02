@@ -1,0 +1,44 @@
+name: Build the Nix package
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'README.*'
+      - 'docs/**'
+
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - 'README.*'
+      - 'docs/**'
+
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Nix
+        uses: ./.github/actions/setup
+        # with:
+        #   cachix-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Build the package
+        run: nix build -L
