@@ -7,6 +7,7 @@
 (package
  (name crista)
  (authors "Akira Komamura <akira.komamura@gmail.com>")
+ (maintainers "Akira Komamura <akira.komamura@gmail.com>")
  (homepage https://github.com/akirak/crista)
  (synopsis "A minimalistic HTTP server framework for OCaml 5")
  (description "A small direct-style server framework for OCaml 5 built on top of the Miou scheduler")
