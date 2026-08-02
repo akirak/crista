@@ -1,8 +1,29 @@
 # Crista
 
+> [!WARNING]
+> This project was originally developed for internal use and remains
+> experimental. Its APIs are
+> subject to change, and there is no guarantee of ongoing maintenance. Use
+> it at your own risk.
+
 Crista is a small direct-style HTTP/1.0 and HTTP/1.1 server framework for
-OCaml 5. Its protocol core is transport-independent, with a ready-to-run Miou
-backend. Request syntax is parsed with Parseff.
+OCaml 5. Its goals are to:
+
+- Allow applications to use effects in their logic.
+- Remain router-agnostic, so applications can use, for example, the
+  [routes](https://github.com/anuragsoni/routes) library.
+- Support features needed to build frontend applications: compression, WebSocket, SSE, etc. Strict conformance to their specs.
+- Support [Picos](https://github.com/ocaml-multicore/picos) for concurrent
+  programming.
+
+At present, the server is built on top of the
+[miou](https://github.com/robur-coop/miou) scheduler.
+
+> [!NOTE]
+> The name comes from cristae, the folds inside mitochondria where ATP
+> production occurs.
+
+## Usage example
 
 ```ocaml
 open Crista
