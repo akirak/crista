@@ -31,7 +31,7 @@
       packages = eachSystem (
         _system: pkgs: with pkgs; {
           default = ocamlPackages.buildDunePackage {
-            pname = "mitochondria";
+            pname = "crista";
             version = "0.1";
             duneVersion = "3";
             src = self.outPath;

@@ -1,11 +1,11 @@
-# Mitochondria
+# Crista
 
-Mitochondria is a small direct-style HTTP/1.0 and HTTP/1.1 server framework for
+Crista is a small direct-style HTTP/1.0 and HTTP/1.1 server framework for
 OCaml 5. Its protocol core is transport-independent, with a ready-to-run Miou
 backend. Request syntax is parsed with Parseff.
 
 ```ocaml
-open Mitochondria
+open Crista
 
 let router =
   Routes.one_of
@@ -21,7 +21,7 @@ let () =
   Miou_server.run ~port:8080 handler
 ```
 
-Mitochondria does not prescribe a routing library: a server accepts a plain
+Crista does not prescribe a routing library: a server accepts a plain
 `Request.t -> Response.t` handler. The example uses the optional `routes`
 library, while applications can plug in any dispatcher with that shape.
 
@@ -35,15 +35,15 @@ are rejected before dispatch.
 ```sh
 nix develop -c dune build
 nix develop -c dune runtest
-nix develop -c dune exec mitochondria -- --bind 127.0.0.1 --port 8080
+nix develop -c dune exec crista -- --bind 127.0.0.1 --port 8080
 ```
 
 `Connection.Make` can be used to add another byte-stream transport.
 
 ## Web Platform Tests
 
-The WPT testharness test in `wpt/mitochondria.any.js` exercises browser Fetch
-against a live Mitochondria process: GET, POST bodies, HEAD, redirects, CORS,
+The WPT testharness test in `wpt/crista.any.js` exercises browser Fetch
+against a live Crista process: GET, POST bodies, HEAD, redirects, CORS,
 and concurrent requests. With a local
 [web-platform-tests](https://github.com/web-platform-tests/wpt) checkout and a
 supported browser installed, run:

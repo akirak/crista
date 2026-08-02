@@ -1,4 +1,4 @@
-open Mitochondria
+open Crista
 
 let fail_parse = function
   | Ok _ -> Alcotest.fail "request unexpectedly parsed"
@@ -154,7 +154,7 @@ let test_routes_integration () =
     (Response.status (dispatch (request "GET" "/missing")))
 
 let () =
-  Alcotest.run "mitochondria"
+  Alcotest.run "crista"
     [ ( "http parsing"
       , [ Alcotest.test_case "request" `Quick test_parse_request
         ; Alcotest.test_case "content length" `Quick test_content_length

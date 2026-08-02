@@ -1,11 +1,11 @@
 (lang dune 3.21)
 
-(name mitochondria)
+(name crista)
 
 (generate_opam_files true)
 
 (package
- (name mitochondria)
+ (name crista)
  (synopsis "A small direct-style HTTP/1 server framework")
  (description "An HTTP/1.0 and HTTP/1.1 server framework for Miou and Picos")
  (depends

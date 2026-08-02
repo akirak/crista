@@ -1,4 +1,4 @@
-open Mitochondria
+open Crista
 
 let port = ref 8080
 
@@ -10,27 +10,27 @@ let cors_headers =
     ; ("access-control-allow-methods", "GET, HEAD, POST, OPTIONS")
     ; ("access-control-allow-headers", "content-type")
     ; ("access-control-allow-private-network", "true")
-    ; ("access-control-expose-headers", "x-mitochondria-method")
+    ; ("access-control-expose-headers", "x-crista-method")
     ; ("cache-control", "no-store") ]
 
 let handler request =
   match Request.path request with
-  | "/" -> Response.text "mitochondria is alive\n"
-  | "/__mitochondria/status" ->
+  | "/" -> Response.text "crista is alive\n"
+  | "/__crista/status" ->
       Response.json ~headers:cors_headers "{\"status\":\"ok\"}"
-  | "/__mitochondria/echo" ->
+  | "/__crista/echo" ->
       Response.make
         ~headers:
-          (Headers.add "x-mitochondria-method" request.meth cors_headers)
+          (Headers.add "x-crista-method" request.meth cors_headers)
         ~body:request.body 200
-  | "/__mitochondria/redirect" ->
+  | "/__crista/redirect" ->
       Response.make
         ~headers:
-          (Headers.add "location" "/__mitochondria/status" cors_headers)
+          (Headers.add "location" "/__crista/status" cors_headers)
         302
   | _ -> Response.text ~headers:cors_headers ~status:404 "Not found\n"
 
-let usage = "mitochondria [--bind ADDRESS] [--port PORT]"
+let usage = "crista [--bind ADDRESS] [--port PORT]"
 
 let () =
   Arg.parse

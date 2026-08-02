@@ -4,7 +4,7 @@ export ODIG_CACHE_DIR := justfile_directory() + "/_build/default/.odig"
 export SHERLODOC_DB := justfile_directory() + "/_build/default/.sherlodoc.marshal"
 
 demo:
-    dune exec mitochondria
+    dune exec crista
 
 # Run Web Platform Tests. Also set BROWSER to a browser executable
 wpt:

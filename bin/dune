@@ -1,4 +1,4 @@
 (executable
- (public_name mitochondria)
+ (public_name crista)
  (name main)
- (libraries mitochondria unix))
+ (libraries crista unix))
