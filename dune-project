@@ -18,7 +18,7 @@
    miou
    parseff
   (alcotest :with-test)
-  (odig :with-test)
+  (odig :with-doc)
   (routes :with-test))
  (tags
   (http server miou picos)))
