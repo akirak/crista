@@ -2,6 +2,7 @@
 opam-version: "2.0"
 synopsis: "A small direct-style HTTP/1 server framework"
 description: "An HTTP/1.0 and HTTP/1.1 server framework for Miou and Picos"
+license: "ISC"
 tags: ["http" "server" "miou" "picos"]
 depends: [
   "dune" {>= "3.21"}

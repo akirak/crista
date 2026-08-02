@@ -18,3 +18,5 @@
   (routes :with-test))
  (tags
   (http server miou picos)))
+
+(license ISC)
