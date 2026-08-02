@@ -47,4 +47,4 @@ jobs:
         env:
           WPT_ROOT: ${{ github.workspace }}/vendor/wpt
           BROWSER: chrome
-        run: ./scripts/run-wpt.sh --yes --headless
+        run: ./scripts/run-wpt.sh --yes --headless --test-types testharness
