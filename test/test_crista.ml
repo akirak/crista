@@ -23,6 +23,16 @@ let test_parse_request () =
         (Request.header "host" request)
   | Ok _ -> Alcotest.fail "wrong request framing"
 
+let test_search_params () =
+  let request target = Request.make ~meth:"GET" ~target ~version:`HTTP_1_1 () in
+  Alcotest.(check (list (pair string string)))
+    "search parameters"
+    [("q", "yes"); ("page", "2"); ("empty", "a=b")]
+    (Request.search_params (request "/search?q=yes&page=2&empty=a=b")) ;
+  Alcotest.(check (list (pair string string)))
+    "no query" []
+    (Request.search_params (request "/search"))
+
 let test_content_length () =
   let parse fields =
     Http.parse_request_head ~max_body_size:32
@@ -157,6 +167,7 @@ let () =
   Alcotest.run "crista"
     [ ( "http parsing"
       , [ Alcotest.test_case "request" `Quick test_parse_request
+        ; Alcotest.test_case "search parameters" `Quick test_search_params
         ; Alcotest.test_case "content length" `Quick test_content_length
         ; Alcotest.test_case "obsolete folding" `Quick
             test_rejects_obsolete_folding

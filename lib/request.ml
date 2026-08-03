@@ -28,3 +28,17 @@ let split_target target =
 let path request = fst (split_target request.target)
 
 let query request = snd (split_target request.target)
+
+let search_params request =
+  match query request with
+  | None | Some "" -> []
+  | Some query ->
+      List.map
+        (fun parameter ->
+          match String.index_opt parameter '=' with
+          | None -> (parameter, "")
+          | Some index ->
+              ( String.sub parameter 0 index
+              , String.sub parameter (index + 1)
+                  (String.length parameter - index - 1) ))
+        (String.split_on_char '&' query)
