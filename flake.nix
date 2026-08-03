@@ -24,6 +24,37 @@
       ...
     }:
     let
+      mkCrista =
+        ocamlPackages:
+        ocamlPackages.callPackage (
+          {
+            alcotest,
+            buildDunePackage,
+            gitMinimal,
+            miou,
+            ocaml-syntax-shims,
+            parseff,
+            routes,
+          }:
+          buildDunePackage {
+            pname = "crista";
+            version = "0.1";
+            duneVersion = "3";
+            src = self.outPath;
+
+            nativeBuildInputs = [ gitMinimal ];
+            buildInputs = [ ocaml-syntax-shims ];
+            propagatedBuildInputs = [
+              miou
+              parseff
+            ];
+            checkInputs = [
+              alcotest
+              routes
+            ];
+          }
+        ) { };
+
       eachSystem =
         f:
         nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed (
@@ -53,28 +84,13 @@
       );
     in
     {
+      overlays.ocamlPackages = final: _prev: {
+        crista = mkCrista final;
+      };
+
       packages = eachSystem (
-        _system: pkgs: with pkgs; {
-          default = ocamlPackages.buildDunePackage {
-            pname = "crista";
-            version = "0.1";
-            duneVersion = "3";
-            src = self.outPath;
-
-            nativeBuildInputs = [ gitMinimal ];
-
-            buildInputs = with ocamlPackages; [ ocaml-syntax-shims ];
-
-            propagatedBuildInputs = with ocamlPackages; [
-              miou
-              parseff
-            ];
-
-            checkInputs = with ocamlPackages; [
-              alcotest
-              routes
-            ];
-          };
+        _system: pkgs: {
+          default = mkCrista pkgs.ocamlPackages;
         }
       );
 
