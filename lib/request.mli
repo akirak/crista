@@ -37,4 +37,5 @@ val query : t -> string option
 (** [query request] returns the part of the target after [?], if present. *)
 
 val search_params : t -> (string * string) list
-(** [search_params request] returns the query parameters in [request]. *)
+(** [search_params request] returns the URL-decoded query parameters in
+    [request]. *)

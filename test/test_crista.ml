@@ -24,11 +24,19 @@ let test_parse_request () =
   | Ok _ -> Alcotest.fail "wrong request framing"
 
 let test_search_params () =
-  let request target = Request.make ~meth:"GET" ~target ~version:`HTTP_1_1 () in
+  let request target =
+    Request.make ~meth:"GET" ~target ~version:`HTTP_1_1 ()
+  in
   Alcotest.(check (list (pair string string)))
     "search parameters"
-    [("q", "yes"); ("page", "2"); ("empty", "a=b")]
-    (Request.search_params (request "/search?q=yes&page=2&empty=a=b")) ;
+    [ ("q", "yes")
+    ; ("page", "2")
+    ; ("empty", "a=b")
+    ; ("hello world", "hello world!")
+    ; ("form value", "a+b") ]
+    (Request.search_params
+       (request
+          "/search?q=yes&page=2&empty=a=b&hello%20world=hello%20world%21&form+value=a%2Bb" ) ) ;
   Alcotest.(check (list (pair string string)))
     "no query" []
     (Request.search_params (request "/search"))
