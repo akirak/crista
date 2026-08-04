@@ -25,6 +25,11 @@ At present, the server is built on top of the
 > The name comes from cristae, the folds inside mitochondria where ATP
 > production occurs.
 
+Crista is tested against the following conformance suites:
+
+- [Web Platform Tests](CONTRIBUTING.md#web-platform-tests)
+- [Autobahn Testsuite](CONTRIBUTING.md#autobahn-websocket-conformance-tests)
+
 ## Usage example
 
 ```ocaml
@@ -84,36 +89,3 @@ nix develop -c dune exec crista -- --bind 127.0.0.1 --port 8080
 ```
 
 `Connection.Make` can be used to add another byte-stream transport.
-
-## Web Platform Tests
-
-The WPT testharness test in `wpt/crista.any.js` exercises browser Fetch
-against a live Crista process: GET, POST bodies, HEAD, redirects, CORS,
-and concurrent requests. With a local
-[web-platform-tests](https://github.com/web-platform-tests/wpt) checkout and a
-supported browser installed, run:
-
-```sh
-nix develop -c dune build
-WPT_ROOT=/path/to/wpt BROWSER=chrome ./scripts/run-wpt.sh
-```
-
-The runner temporarily copies the test into the WPT checkout, starts the server
-on `127.0.0.1:8080`, invokes `wpt run`, then cleans up both. Additional
-`wpt run` options may be passed after the script name.
-
-## Autobahn WebSocket conformance tests
-
-The binary exposes an echo endpoint at
-`ws://127.0.0.1:18181/__crista/websocket`. With Docker available, run the full
-[Autobahn Testsuite](https://github.com/crossbario/autobahn-testsuite) core RFC
-6455 client case set against it. The optional permessage-deflate cases are
-excluded because Crista does not negotiate that extension:
-
-```sh
-nix develop -c just autobahn
-```
-
-The generated HTML report is written to `_build/autobahn/index.html`. Set
-`AUTOBAHN_IMAGE` to pin a particular testsuite image and
-`AUTOBAHN_REPORT_DIR` to change the report directory.
