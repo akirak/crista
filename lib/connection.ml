@@ -173,22 +173,88 @@ module Make (Io : IO) = struct
         Response.text ~status:501 "Transfer encoding not supported\n"
     | `Bad_request message -> Response.text ~status:400 (message ^ "\n")
 
+  let websocket_handshake (request : Request.t) =
+    let bad_request message =
+      Error (Response.text ~status:400 (message ^ "\n"))
+    in
+    if not (String.equal request.meth "GET") then
+      bad_request "WebSocket upgrade requires GET"
+    else if request.version <> `HTTP_1_1 then
+      bad_request "WebSocket upgrade requires HTTP/1.1"
+    else if
+      not (List.mem "websocket" (Headers.tokens "upgrade" request.headers))
+    then bad_request "missing WebSocket Upgrade header"
+    else if
+      not (List.mem "upgrade" (Headers.tokens "connection" request.headers))
+    then bad_request "missing WebSocket Connection header"
+    else
+      match Headers.get_all "sec-websocket-version" request.headers with
+      | ["13"] -> (
+        match Headers.get_all "sec-websocket-key" request.headers with
+        | [key] -> (
+          match Websocket.For_connection.accept_key key with
+          | Some accept -> Ok accept
+          | None -> bad_request "invalid Sec-WebSocket-Key" )
+        | _ -> bad_request "WebSocket upgrade requires one Sec-WebSocket-Key"
+        )
+      | _ ->
+          Error
+            (Response.empty
+               ~headers:(Headers.of_list [("sec-websocket-version", "13")])
+               426 )
+
+  let serve_websocket input request response upgrade =
+    match websocket_handshake request with
+    | Error error ->
+        write_string input.io
+          (Http.serialize_response ~request_method:request.meth ~close:true
+             error )
+    | Ok accept -> (
+        write_string input.io
+          (Http.serialize_websocket_upgrade ~accept
+             ~headers:(Response.headers response) ) ;
+        let read bytes ~off ~len =
+          if String.length input.buffered = 0 then
+            Io.read input.io bytes ~off ~len
+          else
+            let count = min len (String.length input.buffered) in
+            Bytes.blit_string input.buffered 0 bytes off count ;
+            input.buffered <-
+              String.sub input.buffered count
+                (String.length input.buffered - count) ;
+            count
+        in
+        let write string ~off ~len = Io.write input.io string ~off ~len in
+        let websocket =
+          Websocket.For_connection.create
+            ~max_message_size:upgrade.Response.max_message_size ~read ~write
+        in
+        try
+          upgrade.handler websocket ;
+          if Websocket.is_open websocket then Websocket.close websocket
+        with _ -> (
+          if Websocket.is_open websocket then
+            try Websocket.close ~code:1011 websocket with _ -> () ) )
+
   let serve ?(limits = default_limits) io handler =
     if limits.max_header_size <= 0 || limits.max_body_size < 0 then
       invalid_arg "invalid HTTP connection limits" ;
     let input = {io; buffered= ""} in
     let rec loop () =
       match read_request input limits with
-      | request ->
+      | request -> (
           let close = request_wants_close request in
           let response =
             try handler request
             with _ -> Response.text ~status:500 "Internal server error\n"
           in
-          write_string io
-            (Http.serialize_response ~request_method:request.meth ~close
-               response ) ;
-          if not close then loop ()
+          match Response.websocket_upgrade response with
+          | Some upgrade -> serve_websocket input request response upgrade
+          | None ->
+              write_string io
+                (Http.serialize_response ~request_method:request.meth ~close
+                   response ) ;
+              if not close then loop () )
       | exception Clean_eof -> ()
       | exception Protocol_error error ->
           write_string io

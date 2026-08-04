@@ -53,6 +53,28 @@ chunked request bodies, `Expect: 100-continue`, HEAD responses, and configurable
 header/body limits. Ambiguous Content-Length and Transfer-Encoding combinations
 are rejected before dispatch.
 
+WebSocket handlers use the same direct style. Returning `Response.websocket`
+performs an RFC 6455 upgrade; the session API assembles fragmented messages,
+validates UTF-8, answers pings, and performs the closing handshake:
+
+```ocaml
+let handler request =
+  if Request.path request = "/socket" then
+    Response.websocket (fun socket ->
+      let rec echo () =
+        match Websocket.receive socket with
+        | Some (Websocket.Text text) ->
+            Websocket.send_text socket text;
+            echo ()
+        | Some (Websocket.Binary data) ->
+            Websocket.send_binary socket data;
+            echo ()
+        | None -> ()
+      in
+      echo ())
+  else Response.empty 404
+```
+
 ## Build and test
 
 ```sh
@@ -79,3 +101,19 @@ WPT_ROOT=/path/to/wpt BROWSER=chrome ./scripts/run-wpt.sh
 The runner temporarily copies the test into the WPT checkout, starts the server
 on `127.0.0.1:8080`, invokes `wpt run`, then cleans up both. Additional
 `wpt run` options may be passed after the script name.
+
+## Autobahn WebSocket conformance tests
+
+The binary exposes an echo endpoint at
+`ws://127.0.0.1:18181/__crista/websocket`. With Docker available, run the full
+[Autobahn Testsuite](https://github.com/crossbario/autobahn-testsuite) core RFC
+6455 client case set against it. The optional permessage-deflate cases are
+excluded because Crista does not negotiate that extension:
+
+```sh
+nix develop -c just autobahn
+```
+
+The generated HTML report is written to `_build/autobahn/index.html`. Set
+`AUTOBAHN_IMAGE` to pin a particular testsuite image and
+`AUTOBAHN_REPORT_DIR` to change the report directory.

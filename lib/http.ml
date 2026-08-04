@@ -148,6 +148,7 @@ let parse_request_head ~max_body_size input =
 
 let reason_phrase = function
   | 100 -> "Continue"
+  | 101 -> "Switching Protocols"
   | 200 -> "OK"
   | 201 -> "Created"
   | 202 -> "Accepted"
@@ -164,6 +165,7 @@ let reason_phrase = function
   | 408 -> "Request Timeout"
   | 413 -> "Content Too Large"
   | 417 -> "Expectation Failed"
+  | 426 -> "Upgrade Required"
   | 431 -> "Request Header Fields Too Large"
   | 500 -> "Internal Server Error"
   | 501 -> "Not Implemented"
@@ -210,4 +212,24 @@ let serialize_response ~request_method ~close response =
       Printf.bprintf buffer "%s: %s\r\n" name value ) ;
   Buffer.add_string buffer "\r\n" ;
   Buffer.add_string buffer body ;
+  Buffer.contents buffer
+
+let serialize_websocket_upgrade ~accept ~headers =
+  let headers =
+    headers |> Headers.remove "upgrade"
+    |> Headers.remove "connection"
+    |> Headers.remove "sec-websocket-accept"
+    |> Headers.remove "content-length"
+  in
+  let buffer = Buffer.create 256 in
+  Buffer.add_string buffer "HTTP/1.1 101 Switching Protocols\r\n" ;
+  Buffer.add_string buffer "Upgrade: websocket\r\n" ;
+  Buffer.add_string buffer "Connection: Upgrade\r\n" ;
+  Printf.bprintf buffer "Sec-WebSocket-Accept: %s\r\n" accept ;
+  Headers.to_list headers
+  |> List.iter (fun (name, value) ->
+      if not (valid_header_name name && valid_header_text value) then
+        invalid_arg "invalid response header" ;
+      Printf.bprintf buffer "%s: %s\r\n" name value ) ;
+  Buffer.add_string buffer "\r\n" ;
   Buffer.contents buffer

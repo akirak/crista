@@ -21,3 +21,9 @@ val serialize_response :
     as an HTTP/1.1 response and adds connection and content-length fields.
     Payloads are suppressed for [HEAD], 1xx, 204, and 304 responses.
     @raise Invalid_argument if a response header contains invalid field text. *)
+
+val serialize_websocket_upgrade :
+  accept:string -> headers:Headers.t -> string
+(** Serializes a successful RFC 6455 switching-protocols response. Reserved
+    handshake fields supplied in [headers] are replaced with their required
+    values. *)

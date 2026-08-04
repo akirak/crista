@@ -26,6 +26,21 @@ let handler request =
       Response.make
         ~headers:(Headers.add "location" "/__crista/status" cors_headers)
         302
+  | "/__crista/websocket" ->
+      Response.websocket
+        ~max_message_size:(64 * 1024 * 1024)
+        (fun websocket ->
+          let rec echo () =
+            match Websocket.receive websocket with
+            | Some (Websocket.Text text) ->
+                Websocket.send_text websocket text ;
+                echo ()
+            | Some (Websocket.Binary data) ->
+                Websocket.send_binary websocket data ;
+                echo ()
+            | None -> ()
+          in
+          echo () )
   | _ -> Response.text ~headers:cors_headers ~status:404 "Not found\n"
 
 let usage = "crista [--bind ADDRESS] [--port PORT]"

@@ -13,5 +13,9 @@ wpt:
 test:
     dune runtest
 
+# Run the RFC 6455 Autobahn WebSocket protocol test suite in Docker
+autobahn:
+    ./scripts/run-autobahn.sh
+
 odig-odoc:
     odig odoc

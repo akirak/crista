@@ -1,0 +1,12 @@
+{
+  "outdir": "/reports",
+  "servers": [
+    {
+      "agent": "Crista",
+      "url": "ws://127.0.0.1:18181/__crista/websocket"
+    }
+  ],
+  "cases": ["*"],
+  "exclude-cases": ["12.*", "13.*"],
+  "exclude-agent-cases": {}
+}
