@@ -32,6 +32,11 @@ Crista is tested against the following conformance suites:
 
 ## Usage example
 
+> [!NOTE]
+> Also check out [a demo repository](https://github.com/akirak/ocaml-react-demo)
+> which implements [the Inertia protocol](https://inertiajs.com/) in a
+> full-stack OCaml application.
+
 ```ocaml
 open Crista
 
