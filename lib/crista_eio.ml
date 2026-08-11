@@ -4,8 +4,12 @@ module Flow = struct
   type t = Eio.Flow.two_way_ty Eio.Resource.t
 
   let read flow bytes ~off ~len =
-    try Eio.Flow.single_read flow (Cstruct.of_bytes ~off ~len bytes)
-    with End_of_file -> 0
+    let buffer = Cstruct.create len in
+    let count =
+      try Eio.Flow.single_read flow buffer with End_of_file -> 0
+    in
+    Cstruct.blit_to_bytes buffer 0 bytes off count ;
+    count
 
   let write flow string ~off ~len =
     Eio.Flow.write flow [Cstruct.of_string ~off ~len string]
