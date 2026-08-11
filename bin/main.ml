@@ -59,4 +59,4 @@ let () =
   in
   Printf.eprintf "Listening on http://%s:%d\n%!" !bind !port ;
   Eio_main.run (fun environment ->
-      serve ~net:(Eio.Stdenv.net environment) ~address ~port:!port handler)
+      serve ~net:(Eio.Stdenv.net environment) ~address ~port:!port handler )
