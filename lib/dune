@@ -1,4 +1,23 @@
 (library
  (public_name crista)
  (name crista)
- (libraries miou miou.unix parseff unix))
+ (modules crista connection headers http request response websocket)
+ (libraries parseff))
+
+(library
+ (public_name crista-eio)
+ (name crista_eio)
+ (modules crista_eio)
+ (libraries crista cstruct eio eio.unix unix))
+
+(library
+ (public_name crista-picos)
+ (name crista_picos)
+ (modules crista_picos)
+ (libraries crista picos picos_io unix))
+
+(library
+ (public_name crista-miou)
+ (name crista_miou)
+ (modules crista_miou)
+ (libraries crista miou miou.unix unix))

@@ -1,4 +1,5 @@
 (executable
  (public_name crista)
+ (package crista-miou)
  (name main)
- (libraries crista unix))
+ (libraries crista-miou unix))

@@ -1,4 +1,4 @@
-open Crista
+open Crista_miou
 
 let port = ref 8080
 
@@ -58,4 +58,4 @@ let () =
       exit 2
   in
   Printf.eprintf "Listening on http://%s:%d\n%!" !bind !port ;
-  Miou_server.run ~address ~port:!port handler
+  run ~address ~port:!port handler

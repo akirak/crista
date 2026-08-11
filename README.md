@@ -15,11 +15,11 @@ OCaml 5. Its goals are to:
 - Remain router-agnostic, so applications can use, for example, the
   [routes](https://github.com/anuragsoni/routes) library.
 - Support features needed to build frontend applications: compression, WebSocket, SSE, etc. Strict conformance to their specs.
-- Support [Picos](https://github.com/ocaml-multicore/picos) for concurrent
-  programming.
+- Use the same direct-style handler with Eio, Picos, or Miou.
 
-At present, the server is built on top of the
-[miou](https://github.com/robur-coop/miou) scheduler.
+The scheduler integrations are distributed separately as `crista-eio`,
+`crista-picos`, and `crista-miou`. The `crista` package contains the shared
+HTTP and WebSocket implementation and does not depend on a scheduler.
 
 > [!NOTE]
 > The name comes from cristae, the folds inside mitochondria where ATP
@@ -38,7 +38,7 @@ Crista is tested against the following conformance suites:
 > full-stack OCaml application.
 
 ```ocaml
-open Crista
+open Crista_miou
 
 let router =
   Routes.one_of
@@ -51,12 +51,26 @@ let handler request =
   | Routes.NoMatch -> Response.text ~status:404 "Not found\n"
 
 let () =
-  Miou_server.run ~port:8080 handler
+  run ~port:8080 handler
 ```
 
 Crista does not prescribe a routing library: a server accepts a plain
 `Request.t -> Response.t` handler. The example uses the optional `routes`
 library, while applications can plug in any dispatcher with that shape.
+
+The handler definition is identical for every backend. Only the server entry
+point changes:
+
+```ocaml
+(* Eio: call inside Eio_main.run. *)
+Crista_eio.serve ~net:environment#net ~port:8080 handler
+
+(* Picos: call inside any scheduler that handles the Picos effects. *)
+Crista_picos.serve ~port:8080 handler
+
+(* Miou: starts the Miou scheduler and server. *)
+Crista_miou.run ~port:8080 handler
+```
 
 The server supports persistent connections, pipelining, fixed-length and
 chunked request bodies, `Expect: 100-continue`, HEAD responses, and configurable

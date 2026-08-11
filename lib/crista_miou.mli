@@ -1,11 +1,13 @@
-(** A TCP server built on the Miou scheduler. *)
+(** Crista's Miou server backend. *)
+
+include module type of Crista
 
 val serve :
      ?backlog:int
   -> ?limits:Connection.limits
   -> ?address:Unix.inet_addr
   -> port:int
-  -> (Request.t -> Response.t)
+  -> handler
   -> unit
 (** [serve ~port handler] listens on [port] and handles requests until the
     server is stopped or an exception occurs. By default it listens on the
@@ -19,7 +21,7 @@ val run :
   -> ?limits:Connection.limits
   -> ?address:Unix.inet_addr
   -> port:int
-  -> (Request.t -> Response.t)
+  -> handler
   -> unit
 (** [run ~port handler] runs [serve] inside {!Miou_unix.run}. [domains]
     controls the number of Miou domains. *)
