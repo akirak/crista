@@ -15,9 +15,3 @@
  (name crista_picos)
  (modules crista_picos)
  (libraries crista picos picos_io unix))
-
-(library
- (public_name crista-miou)
- (name crista_miou)
- (modules crista_miou)
- (libraries crista miou miou.unix unix))

@@ -118,28 +118,6 @@
             )
           ) { };
 
-          crista-miou = ocamlPackages'.callPackage (
-            {
-              alcotest,
-              buildDunePackage,
-              gitMinimal,
-              miou,
-              crista,
-              ocaml-syntax-shims,
-            }:
-            buildDunePackage (
-              common
-              // {
-                pname = "crista-miou";
-                nativeBuildInputs = [ gitMinimal ];
-                buildInputs = [ ocaml-syntax-shims ];
-                propagatedBuildInputs = [
-                  crista
-                  miou
-                ];
-              }
-            )
-          ) { };
         };
 
       eachSystem =
@@ -188,7 +166,6 @@
               crista
               crista-eio
               crista-picos
-              crista-miou
             ];
             packages = [
               # For running wpt

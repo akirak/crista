@@ -52,20 +52,4 @@
  (tags
   (http server picos)))
 
-(package
- (name crista-miou)
- (authors "Akira Komamura <akira.komamura@gmail.com>")
- (maintainers "Akira Komamura <akira.komamura@gmail.com>")
- (homepage https://github.com/akirak/crista)
- (synopsis "Miou backend for Crista")
- (description "Run Crista HTTP handlers using Miou")
- (depends
-  (ocaml (>= 5.3))
-  (crista (= :version))
-  miou
-  miou_unix
-  (odig :with-doc))
- (tags
-  (http server miou)))
-
 (license ISC)
