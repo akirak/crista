@@ -25,89 +25,120 @@
     }:
     let
       mkCristaPackages =
-        ocamlPackages:
-        builtins.removeAttrs
-          (ocamlPackages.callPackage (
+        isOverlay: ocamlPackages:
+        let
+          common = {
+            version = "0.1";
+            duneVersion = "3";
+            src = self.outPath;
+          };
+
+          crista = ocamlPackages.callPackage (
+            {
+              alcotest,
+              buildDunePackage,
+              gitMinimal,
+              ocaml-syntax-shims,
+              parseff,
+              routes,
+            }:
+            buildDunePackage (
+              common
+              // {
+                pname = "crista";
+                nativeBuildInputs = [ gitMinimal ];
+                buildInputs = [ ocaml-syntax-shims ];
+                propagatedBuildInputs = [ parseff ];
+                checkInputs = [
+                  alcotest
+                  routes
+                ];
+              }
+            )
+          ) { };
+
+          ocamlPackages' =
+            if isOverlay then
+              ocamlPackages
+            else
+              ocamlPackages.overrideScope (
+                _: _: {
+                  inherit crista;
+                }
+              );
+        in
+        {
+          inherit crista;
+
+          crista-eio = ocamlPackages'.callPackage (
+            {
+              buildDunePackage,
+              gitMinimal,
+              crista,
+              eio,
+              ocaml-syntax-shims,
+            }:
+            buildDunePackage (
+              common
+              // {
+                pname = "crista-eio";
+                nativeBuildInputs = [ gitMinimal ];
+                buildInputs = [ ocaml-syntax-shims ];
+                propagatedBuildInputs = [
+                  crista
+                  eio
+                ];
+              }
+            )
+          ) { };
+
+          crista-picos = ocamlPackages'.callPackage (
+            {
+              buildDunePackage,
+              gitMinimal,
+              picos,
+              picos_io,
+              crista,
+              ocaml-syntax-shims,
+            }:
+            buildDunePackage (
+              common
+              // {
+                pname = "crista-picos";
+                nativeBuildInputs = [ gitMinimal ];
+                buildInputs = [ ocaml-syntax-shims ];
+                propagatedBuildInputs = [
+                  crista
+                  picos
+                  picos_io
+                ];
+              }
+            )
+          ) { };
+
+          crista-miou = ocamlPackages'.callPackage (
             {
               alcotest,
               buildDunePackage,
               gitMinimal,
               miou,
-              picos,
-              picos_io,
-              eio,
+              crista,
               ocaml-syntax-shims,
-              parseff,
-              routes,
             }:
-            let
-              common = {
-                version = "0.1";
-                duneVersion = "3";
-                src = self.outPath;
+            buildDunePackage (
+              common
+              // {
+                pname = "crista-miou";
                 nativeBuildInputs = [ gitMinimal ];
                 buildInputs = [ ocaml-syntax-shims ];
-              };
-
-              crista = buildDunePackage (
-                common
-                // {
-                  pname = "crista";
-                  propagatedBuildInputs = [ parseff ];
-                  checkInputs = [
-                    alcotest
-                    routes
-                  ];
-                }
-              );
-
-              crista-eio = buildDunePackage (
-                common
-                // {
-                  pname = "crista-eio";
-                  propagatedBuildInputs = [
-                    crista
-                    eio
-                  ];
-                }
-              );
-
-              crista-picos = buildDunePackage (
-                common
-                // {
-                  pname = "crista-picos";
-                  propagatedBuildInputs = [
-                    crista
-                    picos
-                    picos_io
-                  ];
-                }
-              );
-
-              crista-miou = buildDunePackage (
-                common
-                // {
-                  pname = "crista-miou";
-                  propagatedBuildInputs = [
-                    crista
-                    miou
-                  ];
-                }
-              );
-            in
-            {
-              inherit
-                crista
-                crista-eio
-                crista-picos
-                crista-miou
-                ;
-            }
-          ) { })
-          [
-            "override"
-            "overrideDerivation"
-          ];
+                propagatedBuildInputs = [
+                  crista
+                  miou
+                ];
+              }
+            )
+          ) { };
+        };
 
       eachSystem =
         f:
@@ -138,12 +169,12 @@
       );
     in
     {
-      overlays.ocamlPackages = final: _prev: mkCristaPackages final;
+      overlays.ocamlPackages = final: _prev: mkCristaPackages true final;
 
       packages = eachSystem (
         _system: pkgs:
         let
-          packages = mkCristaPackages pkgs.ocamlPackages;
+          packages = mkCristaPackages false pkgs.ocamlPackages;
         in
         packages // { default = packages.crista; }
       );
