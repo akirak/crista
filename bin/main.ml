@@ -1,4 +1,4 @@
-open Crista_miou
+open Crista_eio
 
 let port = ref 8080
 
@@ -58,4 +58,5 @@ let () =
       exit 2
   in
   Printf.eprintf "Listening on http://%s:%d\n%!" !bind !port ;
-  run ~address ~port:!port handler
+  Eio_main.run (fun environment ->
+      serve ~net:(Eio.Stdenv.net environment) ~address ~port:!port handler)

@@ -76,6 +76,7 @@
               gitMinimal,
               crista,
               eio,
+              eio_main,
               ocaml-syntax-shims,
             }:
             buildDunePackage (
@@ -87,6 +88,7 @@
                 propagatedBuildInputs = [
                   crista
                   eio
+                  eio_main
                 ];
               }
             )

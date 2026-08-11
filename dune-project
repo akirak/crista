@@ -31,6 +31,7 @@
   (ocaml (>= 5.3))
   (crista (= :version))
   eio
+  eio_main
   (odig :with-doc))
  (tags
   (http server eio)))
