@@ -13,7 +13,7 @@
  (description "A small scheduler-neutral direct-style HTTP server framework for OCaml 5")
  (depends
   (ocaml (>= 5.3))
-   parseff
+  (parseff (and (>= 0.6.0) (< 0.7.0)))
   (alcotest :with-test)
   (odig :with-doc)
   (routes :with-test))
