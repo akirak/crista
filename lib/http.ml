@@ -47,20 +47,17 @@ let parse_syntax input =
     let version =
       Parseff.one_of
         [ (fun () ->
-            ignore (Parseff.consume "HTTP/1.1") ;
+            Parseff.literal "HTTP/1.1" ;
             `HTTP_1_1 )
         ; (fun () ->
-            ignore (Parseff.consume "HTTP/1.0") ;
+            Parseff.literal "HTTP/1.0" ;
             `HTTP_1_0 ) ]
-        ()
     in
-    ignore (Parseff.consume "\r\n") ;
+    Parseff.literal "\r\n" ;
     let rec headers count reversed =
       if count > 100 then Parseff.fail "too many header fields" ;
       Parseff.or_
-        (fun () ->
-          ignore (Parseff.consume "\r\n") ;
-          List.rev reversed )
+        (fun () -> Parseff.literal "\r\n" ; List.rev reversed)
         (fun () ->
           let name =
             Parseff.take_while ~at_least:1 ~label:"header name" is_tchar
@@ -68,9 +65,8 @@ let parse_syntax input =
           ignore (Parseff.char ':') ;
           Parseff.skip_while (function ' ' | '\t' -> true | _ -> false) ;
           let value = Parseff.take_while is_field_value_char |> trim_ows in
-          ignore (Parseff.consume "\r\n") ;
+          Parseff.literal "\r\n" ;
           headers (count + 1) ((name, value) :: reversed) )
-        ()
     in
     let headers = headers 0 [] in
     Parseff.end_of_input () ;
@@ -78,15 +74,11 @@ let parse_syntax input =
   in
   match Parseff.parse input parser with
   | Ok value -> Ok value
-  | Error {pos; error} ->
-      let detail =
-        match error with
-        | `Expected expected -> "expected " ^ expected
-        | `Failure message -> message
-        | `Unexpected_end_of_input -> "unexpected end of input"
-        | `Depth_limit_exceeded message -> message
-      in
-      Error (`Bad_request (Printf.sprintf "%s at byte %d" detail pos))
+  | Error error ->
+      let detail = Parseff.error_message error in
+      Error
+        (`Bad_request
+           (Printf.sprintf "%s at byte %d" detail error.range.start) )
 
 let decimal value =
   let length = String.length value in

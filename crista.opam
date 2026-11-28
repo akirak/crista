@@ -11,7 +11,7 @@ homepage: "https://github.com/akirak/crista"
 depends: [
   "dune" {>= "3.21"}
   "ocaml" {>= "5.3"}
-  "parseff"
+  "parseff" {>= "0.6.0" & < "0.7.0"}
   "alcotest" {with-test}
   "odig" {with-doc}
   "routes" {with-test}
