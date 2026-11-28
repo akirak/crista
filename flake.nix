@@ -55,24 +55,6 @@
                 ];
               }
             )
-          ) { inherit parseff; };
-
-          # The nix-ocaml/nix-overlays revision in flake.lock provides an older
-          # parseff; crista requires 0.6.
-          parseff = ocamlPackages.callPackage (
-            {
-              fetchurl,
-              parseff,
-              uucp,
-            }:
-            parseff.overrideAttrs (_: {
-              version = "0.6.0";
-              propagatedBuildInputs = [ uucp ];
-              src = fetchurl {
-                url = "https://github.com/davesnx/parseff/releases/download/0.6.0/parseff-0.6.0.tbz";
-                hash = "sha256-OiYhpKlGzo/rZBYwAnivZJtH2dtJBipj+bEPP0hVdSM=";
-              };
-            })
           ) { };
 
           ocamlPackages' =
